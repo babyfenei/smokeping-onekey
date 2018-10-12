@@ -76,6 +76,7 @@ Configure_SomkePing(){
 	cd /opt/smokeping/etc
 	rm -rf config*
 	wget -O config https://raw.githubusercontent.com/babyfenei/smokeping-onekey/master/config
+	wget -O targets https://raw.githubusercontent.com/babyfenei/smokeping-onekey/master/targets
 	wget -O /opt/smokeping/lib/Smokeping/Graphs.pm https://raw.githubusercontent.com/babyfenei/smokeping-onekey/master/Graphs.pm
 	chmod 600 /opt/smokeping/etc/smokeping_secrets.dist
 }
