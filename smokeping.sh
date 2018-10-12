@@ -73,6 +73,9 @@ Configure_SomkePing(){
 	cd /opt/smokeping/htdocs
 	mkdir var cache data
 	mv smokeping.fcgi.dist smokeping.fcgi
+	cd /opt/smokeping/bin
+	wget -O send_mail https://raw.githubusercontent.com/babyfenei/smokeping-onekey/master/send_mail
+	chmod +x send_mail
 	cd /opt/smokeping/etc
 	rm -rf config*
 	wget -O config https://raw.githubusercontent.com/babyfenei/smokeping-onekey/master/config
