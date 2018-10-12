@@ -21,14 +21,38 @@ syslogfacility = local0
 # concurrentprobes = no
 
 *** Alerts ***
-to = alertee@address.somewhere
+to = |/opt/smokeping/bin/send_mail
 from = smokealert@company.xy
+
++hostdown
+type = loss
+# in percent
+pattern = ==0%,==0%,==0%, ==U
+comment = 对端无响应
+
++hightloss
+type = loss
+# in percent
+pattern = ==0%,==0%,==0%,==0%,>10%,>10%,>10%
+comment = 连续3次采样-丢包率超过10%
+
++lossdetect
+type = loss
+# in percent
+pattern = ==0%,==0%,==0%,==0%,>0%,>0%,>0%
+comment = 连续3次采样-存在丢包
 
 +someloss
 type = loss
 # in percent
 pattern = >0%,*12*,>0%,*12*,>0%
-comment = loss 3 times  in a row
+comment = 间断性丢包
+
++rttdetect
+type = rtt
+# in milli seconds
+pattern = <100,<100,<100,<100,<100,<150,>150,>150,>150
+comment = 连续3次采样延迟增大-超过150ms
 
 *** Database ***
 
@@ -84,7 +108,7 @@ format = Median RTT %f seconds
 
 width = 600
 height = 50
-range = 10h
+range = 24h
 
 + detail
 
@@ -92,10 +116,10 @@ width = 600
 height = 200
 unison_tolerance = 2
 
-"Last 3 Hours"    3h
-"Last 30 Hours"   30h
-"Last 10 Days"    10d
-"Last 400 Days"   400d
+"Last 1 Hours"    1h
+"Last 24 Hours"   24h
+"Last 1 Months"   31d
+"Last 1 Years"    1y
 
 #+ hierarchies
 #++ owner
@@ -128,20 +152,6 @@ title = Network Latency Grapher
 remark = Welcome to the SmokePing website of xxx Company. \
          Here you will learn all about the latency of our network.
 
-+ Test
-menu= Targets
-#parents = owner:/Test/James location:/
 
-++ James
 
-menu = James
-title = James
-alerts = someloss
-slaves = boomer slave2
-host = james.address
-
-++ MultiHost
-
-menu = Multihost
-title = James and James as seen from Boomer
-host = /Test/James /Test/James~boomer
+@include targets

@@ -26,8 +26,8 @@ Get_PID(){
 #更换安装包源
 Change_Source(){
 	yum clean all
-	wget -O /etc/yum.repos.d/CentOS-Base.repo https://raw.githubusercontent.com/ILLKX/smokeping-onekey/master/CentOS-Base.repo
-	wget -O /etc/yum.repos.d/epel.repo https://raw.githubusercontent.com/ILLKX/smokeping-onekey/master/epel-7.repo
+	wget -O /etc/yum.repos.d/CentOS-Base.repo https://raw.githubusercontent.com/babyfenei/smokeping-onekey/master/CentOS-Base.repo
+	wget -O /etc/yum.repos.d/epel.repo https://raw.githubusercontent.com/babyfenei/smokeping-onekey/master/epel-7.repo
 }
 
 #安装elep
@@ -37,13 +37,13 @@ Install_Epel(){
 
 #安装依赖
 Install_Dependency(){
-	yum install rrdtool perl-rrdtool perl-core openssl-devel fping curl gcc-c++ wqy-zenhei-fonts.noarch -y
+	yum install rrdtool perl-rrdtool perl-core openssl-devel fping curl gcc-c++ wqy-zenhei-fonts.noarch mtr sendmail mailx ntp vim -y
 }
 
 #下载smokeping
 Download_Source(){
 	cd
-	wget https://github.com/ILLKX/smokeping-onekey/raw/master/smokeping-2.6.11.tar.gz
+	wget https://github.com/babyfenei/smokeping-onekey/raw/master/smokeping-2.6.11.tar.gz
 	tar -xzvf smokeping-2.6.11.tar.gz
 	cd smokeping-2.6.11
 }
@@ -60,6 +60,14 @@ Delete_Files(){
 	rm -rf /root/smokeping-2.6.*
 }
 
+#安装nali
+Install_nali(){
+	cd
+	wget -O config https://raw.githubusercontent.com/babyfenei/smokeping-onekey/nali.tar.gz
+	tar -zxvf nali.tar.gz
+	./configure && make && make install
+}
+
 #配置smokeping
 Configure_SomkePing(){
 	cd /opt/smokeping/htdocs
@@ -67,8 +75,8 @@ Configure_SomkePing(){
 	mv smokeping.fcgi.dist smokeping.fcgi
 	cd /opt/smokeping/etc
 	rm -rf config*
-	wget -O config https://raw.githubusercontent.com/ILLKX/smokeping-onekey/master/config
-	wget -O /opt/smokeping/lib/Smokeping/Graphs.pm https://raw.githubusercontent.com/ILLKX/smokeping-onekey/master/Graphs.pm
+	wget -O config https://raw.githubusercontent.com/babyfenei/smokeping-onekey/master/config
+	wget -O /opt/smokeping/lib/Smokeping/Graphs.pm https://raw.githubusercontent.com/babyfenei/smokeping-onekey/master/Graphs.pm
 	chmod 600 /opt/smokeping/etc/smokeping_secrets.dist
 }
 
@@ -85,23 +93,30 @@ Install_Nginx(){
 
 #修改Nginx配置文件
 Configure_Nginx(){
-	wget -O /etc/nginx/conf.d/smokeping.conf https://raw.githubusercontent.com/ILLKX/smokeping-onekey/master/smokeping.conf
+	wget -O /etc/nginx/conf.d/smokeping.conf https://raw.githubusercontent.com/babyfenei/smokeping-onekey/master/smokeping.conf
 	rm -rf /etc/nginx/nginx.conf
-	wget -O /etc/nginx/nginx.conf https://raw.githubusercontent.com/ILLKX/smokeping-onekey/master/nginx.conf
+	wget -O /etc/nginx/nginx.conf https://raw.githubusercontent.com/babyfenei/smokeping-onekey/master/nginx.conf
 }
 
 #修改Nginx配置文件 Master
 Master_Configure_Nginx(){
-	wget -O /etc/nginx/conf.d/smokeping.conf https://raw.githubusercontent.com/ILLKX/smokeping-onekey/master/smokeping-master.conf
+	wget -O /etc/nginx/conf.d/smokeping.conf https://raw.githubusercontent.com/babyfenei/smokeping-onekey/master/smokeping-master.conf
 	rm -rf /etc/nginx/nginx.conf
-	wget -O /etc/nginx/nginx.conf https://raw.githubusercontent.com/ILLKX/smokeping-onekey/master/nginx.conf
+	wget -O /etc/nginx/nginx.conf https://raw.githubusercontent.com/babyfenei/smokeping-onekey/master/nginx.conf
 }
 
-#启动Nginx并禁用防火墙
+#启动Nginx/sendmail并禁用防火墙
 Start_Nginx_Disable_Firewall(){
-	systemctl start nginx
 	systemctl stop firewalld
 	systemctl disable firewalld
+	systemctl enable nginx
+	systemctl enable ntpd
+	systemctl enable sendmail
+	systemctl start sendmail
+	systemctl start ntpd
+	systemctl start nginx
+	rm -rf /etc/localtime
+        ln -s /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 }
 
 #禁用SELinux
@@ -154,6 +169,7 @@ Single_Install(){
 	Download_Source
 	Install_SomkePing
 	Configure_SomkePing
+	Install_nali
 	Install_Nginx
 	Configure_Nginx
 	Start_Nginx_Disable_Firewall
@@ -176,6 +192,7 @@ Slaves_Install(){
 	Install_Dependency
 	Download_Source
 	Install_SomkePing
+	Install_nali
 	Slaves_Set_Secret
 	Configure_SomkePing
 	Disable_SELinux
@@ -198,6 +215,7 @@ Master_Install(){
 	Download_Source
 	Install_SomkePing
 	Configure_SomkePing
+	Install_nali
 	Master_Configure_SomkePing
 	Install_Nginx
 	Master_Configure_Nginx
@@ -233,7 +251,7 @@ Install_Tcpping(){
 	cd
 	yum install tcptraceroute -y
 	rm -rf /usr/bin/tcpping
-	wget https://raw.githubusercontent.com/ILLKX/smokeping-onekey/master/tcpping
+	wget https://raw.githubusercontent.com/babyfenei/smokeping-onekey/master/tcpping
 	chmod 777 tcpping
 	mv tcpping /usr/bin/
 	echo -e "${Info} 安装 tcpping 完成"
