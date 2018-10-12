@@ -63,7 +63,7 @@ Delete_Files(){
 #安装nali
 Install_nali(){
 	cd
-	wget -O config https://raw.githubusercontent.com/babyfenei/smokeping-onekey/nali.tar.gz
+	wget -O nali.tar.gz https://raw.githubusercontent.com/babyfenei/smokeping-onekey/nali.tar.gz
 	tar -zxvf nali.tar.gz
 	./configure && make && make install
 }
