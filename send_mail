@@ -17,8 +17,8 @@ smokename="AlertName"
 smokeping_mail_content=/tmp/smokeping_mail_content
  
 # 把所有传过来的变量输出到脚本调用日志里，方便统计和问题排查
-echo "$(date +%F-%T)" >> invoke.log
-echo $@ >> invoke.log
+#echo "$(date +%F-%T)" >> invoke.log
+#echo $@ >> invoke.log
  
 # 网络恢复逻辑判断
 if [ "$losspattern" = "loss: 0%" ];
@@ -43,11 +43,16 @@ echo "Loss Pattern: " $losspattern | tee -a ${smokeping_mail_content}
 echo "RTT Pattern: " $rtt | tee -a ${smokeping_mail_content}
 echo "Hostname: " $hostname | tee -a ${smokeping_mail_content}
 echo -e "\n" | tee -a ${smokeping_mail_content}
-echo "----------------PING--------------------" | tee -a ${smokeping_mail_content}
-ping -c 1 -i 0.5 $hostname  | tee -a ${smokeping_mail_content}
 echo "----------------MTR--------------------" | tee -a ${smokeping_mail_content}
 echo "SOURCE IP :$SRC_IP  DESTENT IP :$DET_IP"|nali | tee -a ${smokeping_mail_content}
-#mtr --no-dns  -r -c3 -w -b $DET_IP | nali | column -s "]" -s " " -s "[" | column -t |grep -v "对
-方和您在同一内部网" | tee -a ${smokeping_mail_content}
-mtr -n --report  $hostname | tee -a ${smokeping_mail_content}
-cat /tmp/smokeping_mail_content |mail -s "$subject" $email
+mtr --no-dns  -r -c3 -w -b $DET_IP | nali | column -s "]" -s " " -s "[" | column -t |grep -v "对方和您在
+同一内部网" | tee -a ${smokeping_mail_content}
+#mtr -n --report  $hostname | tee -a ${smokeping_mail_content}
+echo "----------------PING-------------------" | tee -a ${smokeping_mail_content}
+ping -c 10 -i 0.5 $hostname |tail -n 3 | tee -a ${smokeping_mail_content}
+echo -e "\n" | tee -a ${smokeping_mail_content}
+echo "This message was send by $SRC_IP Smokeping Server. By Fenei From AMSINPUL. " | tee -a ${smokeping_mail_content}
+# 判断最近10次报警是否包含本次报警主机
+invoke_info=`cat /opt/smokeping/bin/invoke.log | tail -5 | grep -w $hostname`
+#如果包含退出脚本，不包含则发送邮件
+[[ -z $invoke_info ]] && echo "$(date +%F-%T):mail has been send **************************************!" >> invoke.log && echo $@ >> invoke.log && cat $smokeping_mail_content |mail -s "$subject" $email && exit  ||  echo "$(date +%F-%T):mail not send #####################################" >> invoke.log && echo $@ >> invoke.log &&  exit
