@@ -2,11 +2,11 @@
 
 
 ## 更新内容 ##
-1.本脚本通过https://github.com/ILLKX/smokeping-onekey修改而来，在原作的基础上添加了邮件报警，
-2.邮件报警的同时会对目标主机进行ping测和MTR测试。
-3.脚本添加nali数据库，在ping测和MTR的同时对IP进行归属解析。
-4.脚本修改配置文件，将所有的检测节点添加到targets配置文件中，如需添加节点只需要修改此文件即可。
-5.如需开机启动，可将此命令添加至/etc/rc.local中```echo '7' | bash /root/smokeping-onekey/smokeping.sh --stdin```,请在实际使用中修改脚本存放路径
+- 本脚本通过 [https://github.com/ILLKX/smokeping-onekey](https://github.com/ILLKX/smokeping-onekey) 修改而来，在原作的基础上添加了邮件报警，
+- 邮件报警的同时会对目标主机进行ping测和MTR测试。
+- 脚本添加nali数据库，在ping测和MTR的同时对IP进行归属解析。
+- 脚本修改配置文件，将所有的检测节点添加到targets配置文件中，如需添加节点只需要修改此文件即可。
+- 如需开机启动，可将此命令添加至/etc/rc.local中```echo '7' | bash /root/smokeping-onekey/smokeping.sh --stdin```,请在实际使用中修改脚本存放路径
 
 ## 原版介绍 ##
 一个Shell脚本，集成SmokePing三种版本(Master/Slaves/单机版)安装、启动、停止、重启等基本操作，方便用户操作。
